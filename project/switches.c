@@ -12,9 +12,7 @@ switch_update_interrupt_sense()
     
       P2IES |= (p2val & SWITCHES);	/* if switch up, sense down */
       P2IES &= (p2val |~SWITCHES);   /* if switch down, sense up */
-  
-  /* P2IES.0 &= (p2val | ~SW1);	 if switch down, sense up */
-  
+    
   return p2val;
 }
 

@@ -1,27 +1,50 @@
 #include <msp430.h>
-#include "libTimer.h"
-#include "led.h"
-#include "buzzer.h"
-#include "stateMachines.h"
 #include <libTimer.h>
 #include "lcdutils.h"
 #include "lcddraw.h"
+#include "led.h"
+
+//#define LED_GREEN BIT6             // P1.6
 
 
-int main(void) {
-  configureClocks();		/* setup master oscillator, CPU & peripheral clocks */
-  //switch_init();
-  //led_init();
-  //buzzer_init();
+short redrawScreen = 1;
+u_int fontFgColor = COLOR_GREEN;
+
+u_int shapeColor = COLOR_GREEN;
+
+void wdt_c_handler()
+{
+  static int secCount = 0;
+
+  secCount ++;
+  if (secCount == 250) {		/* once/sec */
+    secCount = 0;
+    fontFgColor = (fontFgColor == COLOR_GREEN) ? COLOR_BLACK : COLOR_GREEN;
+    shapeColor = (shapeColor == COLOR_GREEN) ? COLOR_RED : COLOR_BLACK;
+    redrawScreen = 1;
+  }
+}
   
-  //enableWDTInterrupts();	/* enable periodic interrupt */
-  u_char width = screenWidth, height = screenHeight;
 
-  clearScreen(COLOR_BLACK);
-
-  drawString8x12(20,20, "hello", COLOR_GREEN, COLOR_RED);
-  fillRectangle(5, 40, 8, 50, COLOR_BLUE);
-  fillRectangle(width - 13, 40, 8, 50, COLOR_RED);
-
-  or_sr(0x18);		/* CPU off, GIE on */
+void main()
+{
+  P1DIR |= LED_GREEN;		/**< Green led on when CPU on */		
+  P1OUT |= LED_GREEN;
+  configureClocks();
+  lcd_init();
+  
+  enableWDTInterrupts();      /**< enable periodic interrupt */
+  or_sr(0x8);	              /**< GIE (enable interrupts) */
+  
+  clearScreen(COLOR_BLUE);
+  while (1) {			/* forever */
+    if (redrawScreen) {
+      redrawScreen = 0;
+      
+      drawString8x12(20,20, "hello", fontFgColor, COLOR_BLUE);
+    }
+    P1OUT &= ~LED_GREEN;	/* green off */
+    or_sr(0x10);		/**< CPU OFF */
+    P1OUT |= LED_GREEN;		/* green on */
+  }
 }
