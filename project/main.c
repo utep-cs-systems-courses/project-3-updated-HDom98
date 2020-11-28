@@ -3,8 +3,7 @@
 #include "lcdutils.h"
 #include "lcddraw.h"
 #include "led.h"
-
-//#define LED_GREEN BIT6             // P1.6
+#include "switches.h"
 
 
 short redrawScreen = 1;
@@ -14,15 +13,45 @@ u_int shapeColor = COLOR_GREEN;
 
 void wdt_c_handler()
 {
-  static int secCount = 0;
-
-  secCount ++;
-  if (secCount == 250) {		/* once/sec */
+  static int count = 0;
+  switch(switch_state_down)
+    {
+    case 0: /* siren state */
+     if ((++count % 25) == 0)
+       {
+	 siren_on();
+	 
+       }
+     if (++count == 250)
+       {
+	 
+	 siren_advance();
+	 count = 0;
+       }
+     break;
+    case 1:/* light dimming state */
+      if((++count % 75) == 0)
+	light_advance();
+      break;
+    case 2:/* blinking light state */
+      if(++count == 125)
+	clearScreen(COLOR_BLUE);
+	//blink_advance();
+      break;
+    case 3:/* off state */
+      buzz_off();
+      break;
+    default:
+      break;
+    
+    }
+  /*secCount ++;
+  if (secCount == 250) {
     secCount = 0;
     fontFgColor = (fontFgColor == COLOR_GREEN) ? COLOR_BLACK : COLOR_GREEN;
     shapeColor = (shapeColor == COLOR_GREEN) ? COLOR_RED : COLOR_BLACK;
     redrawScreen = 1;
-  }
+    }*/
 }
   
 
@@ -32,11 +61,13 @@ void main()
   P1OUT |= LED_GREEN;
   configureClocks();
   lcd_init();
+  switch_init();
+  buzzer_init();
   
   enableWDTInterrupts();      /**< enable periodic interrupt */
   or_sr(0x8);	              /**< GIE (enable interrupts) */
-  
-  clearScreen(COLOR_BLUE);
+
+  // clearScreen(COLOR_BLUE);
   while (1) {			/* forever */
     if (redrawScreen) {
       redrawScreen = 0;

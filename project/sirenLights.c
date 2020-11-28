@@ -1,8 +1,9 @@
 #include <msp430.h>
-#include "stateMachines.h"
+#include "statemachines.h"
 #include "led.h"
 #include "buzzer.h"
 
+//extern static char up;
 
 void siren_advance()
 {
