@@ -5,7 +5,6 @@
 #include "led.h"
 #include "switches.h"
 
-
 short redrawScreen = 1;
 
 void wdt_c_handler()
@@ -51,8 +50,7 @@ void wdt_c_handler()
       redrawScreen = 1;
       break;
     default:
-      break;
-    
+      break;    
     }
 }
   
