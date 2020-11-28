@@ -7,9 +7,6 @@
 
 
 short redrawScreen = 1;
-u_int fontFgColor = COLOR_GREEN;
-
-u_int shapeColor = COLOR_GREEN;
 
 void wdt_c_handler()
 {
@@ -19,39 +16,44 @@ void wdt_c_handler()
     case 0: /* siren state */
      if ((++count % 25) == 0)
        {
+	 green_on = 1;
+	 led_update();
 	 siren_on();
-	 
        }
      if (++count == 250)
        {
-	 
+	 green_on = 1;
+	 led_update();
 	 siren_advance();
 	 count = 0;
        }
+     redrawScreen = 1;
      break;
     case 1:/* light dimming state */
+      green_on = 1;
+      led_update();
+      
       if((++count % 75) == 0)
 	light_advance();
+      redrawScreen = 1;
       break;
     case 2:/* blinking light state */
-      if(++count == 125)
+      green_on = 1;
+      led_update();
+      
+      if((++count % 50) == 0)
 	clearScreen(COLOR_BLUE);
-	//blink_advance();
+      clearScreen(COLOR_RED);
+      redrawScreen = 1;
       break;
     case 3:/* off state */
       buzz_off();
+      redrawScreen = 1;
       break;
     default:
       break;
     
     }
-  /*secCount ++;
-  if (secCount == 250) {
-    secCount = 0;
-    fontFgColor = (fontFgColor == COLOR_GREEN) ? COLOR_BLACK : COLOR_GREEN;
-    shapeColor = (shapeColor == COLOR_GREEN) ? COLOR_RED : COLOR_BLACK;
-    redrawScreen = 1;
-    }*/
 }
   
 
@@ -67,15 +69,8 @@ void main()
   enableWDTInterrupts();      /**< enable periodic interrupt */
   or_sr(0x8);	              /**< GIE (enable interrupts) */
 
-  // clearScreen(COLOR_BLUE);
-  while (1) {			/* forever */
-    if (redrawScreen) {
-      redrawScreen = 0;
-      
-      drawString8x12(20,20, "hello", fontFgColor, COLOR_BLUE);
-    }
-    P1OUT &= ~LED_GREEN;	/* green off */
-    or_sr(0x10);		/**< CPU OFF */
-    P1OUT |= LED_GREEN;		/* green on */
-  }
+  redrawScreen = 1;
+  
+  P1OUT &= ~LED_GREEN;	/* green off */
+  or_sr(0x10);		/**< CPU OFF */
 }

@@ -38,7 +38,7 @@ void siren_advance()
     }
 }
 
-void light_advance() /* just turns on both LEDs */
+void light_advance() /* just turns on the red LED */
 {
   buzzer_set_period(0);
   red_on = 1;
