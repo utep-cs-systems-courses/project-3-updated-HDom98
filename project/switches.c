@@ -40,11 +40,3 @@ switch_interrupt_handler()
   if((p2val & SW4)==0)switch_state_down = 3;
     
 }
-
-void
-__interrupt_vec(PORT2_VECTOR) Port_2(){
-  if (P2IFG & SWITCHES) {	      /* did a button cause this interrupt? */
-    P2IFG &= ~SWITCHES;		      /* clear pending sw interrupts */
-    switch_interrupt_handler();	/* single handler for all switches */
-  }
-}
