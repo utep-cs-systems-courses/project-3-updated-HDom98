@@ -26,12 +26,12 @@ void siren_advance()
     {
     case 0:/* state 1 red off */
       up = 1;
-      clearScreen(COLOR_BLUE);
+      // clearScreen(COLOR_BLUE);
       state++;
       break;
     case 1:/* state 2 red on, green off */
       up = 0;
-      clearScreen(COLOR_RED);
+      //clearScreen(COLOR_RED);
       state = 0;
     default:
       break;
