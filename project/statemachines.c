@@ -25,14 +25,17 @@ void siren_advance()
   switch(state)
     {
     case 0:/* state 1 red off */
+      red_on = 0;
+      led_update();
       up = 1;
-      // clearScreen(COLOR_BLUE);
       state++;
       break;
-    case 1:/* state 2 red on, green off */
-      up = 0;
-      //clearScreen(COLOR_RED);
+    case 1:/* state 2 red on */
+      red_on = 1;
+      led_update();
       state = 0;
+      up = 0;
+      break;
     default:
       break;
     }

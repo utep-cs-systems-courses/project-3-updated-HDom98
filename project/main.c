@@ -4,6 +4,8 @@
 #include "lcddraw.h"
 #include "led.h"
 #include "switches.h"
+#include "statemachines.h"
+#include "buzzer.h"
 
 short redrawScreen = 1;
 
@@ -18,43 +20,40 @@ void wdt_c_handler()
     case 0: /* siren state */	 
      if ((++count % 25) == 0)
        {
-	 screenColor = (screenColor == COLOR_BLUE) ? COLOR_BLUE : COLOR_RED;
 	 siren_on();
        }
-     if (++count == 125)
+     if(++count == 250)
        {
-	 siren_advance();
+    	 siren_advance();
+	 //redrawScreen = 1;
 	 count = 0;
        }
-     redrawScreen = 1;
      break;
     case 1:/* light dimming state */
-      fontFgColor = COLOR_RED;
-      screenColor = COLOR_GREEN;
-      
-      if((++count % 75) == 0)
-	light_advance();
-      redrawScreen = 1;
+      if((++count % 75) == 0) light_advance();
+	
+      if(++count == 250)
+	{
+	  redrawScreen = 1;
+	  count = 0;
+	}
       break;
     case 2:/* blinking light state */
-      if((++count % 50) == 0){
-	 fontFgColor = COLOR_RED;
-	 screenColor = COLOR_BLUE;
-	 redrawScreen = 1;
-      }
-      
-      fontFgColor = COLOR_BLUE;
-      screenColor = COLOR_RED;
-      redrawScreen = 1;
-      
+      if(++count == 125) light_advance();
+        
+      if(++count == 250)
+	{
+	  redrawScreen = 1;
+	  count = 0;
+	}
       break;
     case 3:/* off state */
-
-      //screenColor = COLOR_BLACK;
-      //fontFgColor = COLOR_GREEN;
-      
       buzz_off();
-      redrawScreen = 1;
+      if(++count == 250)
+	{
+	  redrawScreen = 1;
+	  count = 0;
+	}
       break;
     default:
       break;    
@@ -64,13 +63,14 @@ void wdt_c_handler()
 
 void main()
 {
-  P1DIR |= LED_GREEN;		/**< Green led on when CPU on */		
-  P1OUT |= LED_GREEN;
   configureClocks();
   lcd_init();
+  led_init();
   switch_init();
   buzzer_init();
-  
+
+  green_on = 1;
+  led_update();
   enableWDTInterrupts();      /**< enable periodic interrupt */
   or_sr(0x8);	              /**< GIE (enable interrupts) */
 
@@ -81,27 +81,33 @@ void main()
 	switch(switch_state_down)
 	  {
 	  case 0:
-	    clearScreen(screenColor);
+	    // clearScreen(COLOR_RED);
 	    break;
-
+	    
 	  case 1:
-	    drawString5x7(20,20, "Hello", fontFgColor, screenColor);
-	    clearScreen(screenColor);
+	    drawString5x7(20,20, "Hello", COLOR_RED, COLOR_PURPLE);
+	    clearScreen(COLOR_PURPLE);
 	    break;
 
 	  case 2:
-	    drawString5x7(20,20, "WEE WOO", fontFgColor, screenColor);
-	    drawString5x7(20,50, "WEE WOO", fontFgColor, screenColor);
+	    clearScreen(COLOR_BLACK);
+	    drawString5x7(20,20, "WEE WOO", COLOR_GREEN, COLOR_BLACK);
+	    drawString5x7(20,50, "WEE WOO", COLOR_PURPLE, COLOR_BLACK);
 	    break;
+	    
 	  case 3:
 	    clearScreen(COLOR_BLACK);
 	    drawString5x7(20,20, "Goodbye", COLOR_GREEN, COLOR_BLACK);
 	    break;
 	  default:break;
 	  }
-    P1OUT &= ~LED_GREEN;	/* green off */
-    or_sr(0x10);		/**< CPU OFF */
-    P1OUT |= LED_GREEN;		/* green on */
   }
+    green_on = 0;	/* green off */
+    led_update();
+    
+    or_sr(0x10);       	/**< CPU OFF */
+    
+    green_on = 1;      	/* green on */
+    led_update();
  }
 }
