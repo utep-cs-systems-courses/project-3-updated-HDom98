@@ -11,7 +11,8 @@ short redrawScreen = 1;
 
 u_char width = screenWidth, height = screenHeight;
 
-u_int fontFgColor = COLOR_RED;
+u_int shapeColor1 = COLOR_RED;
+u_int shapeColor2 = COLOR_GREEN;
 u_int screenColor = COLOR_BLUE;
 
 void wdt_c_handler()
@@ -20,35 +21,38 @@ void wdt_c_handler()
   switch(switch_state_down)
     {
     case 0: /* siren state */
-      count++;
-     if ((count % 25) == 0)
+     if ((++count % 25) == 0)
        {
+	 siren_on();
 	 redrawScreen = 1;
 	 screenColor = COLOR_BLUE;
-	 siren_on();
        }
-     if(count == 250)
+     if(++count == 250)
        {
+	 siren_advance();
 	 screenColor = COLOR_RED;
-    	 siren_advance();
 	 redrawScreen = 1;
 	 count = 0;
        }
      break;
     case 1:/* light dimming state */
-      if((++count % 75) == 0) light_advance();
-	
+      //if((++count % 50) == 0) light_advance();
+      buzz_off();
       if(++count == 250)
 	{
+	  shapeColor1 = COLOR_BLUE;
+	  shapeColor2 = COLOR_RED;
 	  redrawScreen = 1;
 	  count = 0;
 	}
       break;
     case 2:/* blinking light state */
-      if(++count == 125) light_advance();
-        
+      //if(++count == 125) light_advance();
+      buzz_off();
       if(++count == 250)
 	{
+	  shapeColor1 = COLOR_PURPLE;
+	  shapeColor2 = COLOR_PINK;
 	  redrawScreen = 1;
 	  count = 0;
 	}
@@ -57,6 +61,8 @@ void wdt_c_handler()
       buzz_off();
       if(++count == 250)
 	{
+	  shapeColor1 = COLOR_GREEN;
+	  shapeColor2 = COLOR_WHITE;
 	  redrawScreen = 1;
 	}
       break;
@@ -91,20 +97,22 @@ void main()
           break;
 	    
 	  case 1:
+	    drawSquare(shapeColor1,shapeColor2);
 	    drawString5x7(20,20, "Hello", COLOR_RED, screenColor);
 	    clearScreen(screenColor);
 	    break;
 
 	  case 2:
 	    clearScreen(COLOR_BLACK);
-	    drawString5x7(20,20, "WEE WOO", COLOR_GREEN, COLOR_BLACK);
-	    drawString5x7(20,50, "WEE WOO", COLOR_PURPLE, COLOR_BLACK);
+	    drawString5x7(20,20, "WEE WOO", COLOR_BLUE, COLOR_GREEN);
+	    drawString5x7(20,50, "WEE WOO", COLOR_RED, COLOR_GREEN);
+	    drawSquare(shapeColor1,shapeColor2);
 	    break;
 	    
 	  case 3:
 	    clearScreen(COLOR_BLACK);
+	    drawSquare(shapeColor1,shapeColor2);
 	    drawString5x7(20,50, "Goodbye", COLOR_GREEN, COLOR_BLACK);
-	    drawSquare();
 	    break;
 	  default:break;
 	  }
@@ -119,15 +127,15 @@ void main()
  }
 }
 
-void drawSquare()
+void drawSquare(u_int color1,u_int color2)
 {
  u_char center = 15;
   for(u_char r = 20; r < 31; r++)
     {
       for(u_char c = 0; c <= 11; c++)
 	{
-	  drawPixel(c, r, COLOR_WHITE);  
-	  drawPixel(r, c, COLOR_WHITE);
+	  drawPixel(c, r, color1);  
+	  drawPixel(r, c, color1);
 	}
     }
 
@@ -135,8 +143,8 @@ void drawSquare()
     {
       for(u_char c = 0; c < center; c++)
 	{
-	  drawPixel(c + center, r + center, COLOR_BLACK);
-	   drawPixel(c - center, r - center, COLOR_BLACK);
+	  drawPixel(c + center, r + center, color2);
+	  drawPixel(c - center, r - center, color2);
 	}
     } 
 }

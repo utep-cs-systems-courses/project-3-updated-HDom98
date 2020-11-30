@@ -11,6 +11,7 @@ jt:	.word option0
 
 	.extern up
 up:	.byte
+	.global sum
 	.global siren_advance
 siren_advance:
 	cmp #3, &up		;jumping to default if its over 2
@@ -28,5 +29,21 @@ option1:
 	mov #0, &up		;up = 0
 	mov #0, r12		;state = 0
 	CALL #led_update
+	jmp end
 default:jmp end
 end:	pop r0
+
+sum:
+	sub #2, r1
+	mov #-5,2(r1) 		;i = -5
+loop:	
+	cmp #0,2(r1)		;if i >= 0
+	jge endL
+	add #1,r12		;sum++
+	add #1,2(r1)		;i++
+	jmp loop
+	
+endL:	mov 2(r1), r12
+	add #2, r1
+	pop r0
+	
