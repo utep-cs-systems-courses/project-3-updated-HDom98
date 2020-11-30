@@ -19,14 +19,15 @@ void wdt_c_handler()
   static int count = 0;
   switch(switch_state_down)
     {
-    case 0: /* siren state */	 
-     if ((++count % 25) == 0)
+    case 0: /* siren state */
+      count++;
+     if ((count % 25) == 0)
        {
 	 redrawScreen = 1;
 	 screenColor = COLOR_BLUE;
 	 siren_on();
        }
-     if(++count == 250)
+     if(count == 250)
        {
 	 screenColor = COLOR_RED;
     	 siren_advance();
@@ -57,7 +58,6 @@ void wdt_c_handler()
       if(++count == 250)
 	{
 	  redrawScreen = 1;
-	  //count = 0;
 	}
       break;
     default:
@@ -103,7 +103,8 @@ void main()
 	    
 	  case 3:
 	    clearScreen(COLOR_BLACK);
-	    drawString5x7(20,20, "Goodbye", COLOR_GREEN, COLOR_BLACK);
+	    drawString5x7(20,50, "Goodbye", COLOR_GREEN, COLOR_BLACK);
+	    drawSquare();
 	    break;
 	  default:break;
 	  }
@@ -120,8 +121,8 @@ void main()
 
 void drawSquare()
 {
- u_char center = 5;
-  for(u_char r = 0; r < 11; r++)
+ u_char center = 15;
+  for(u_char r = 20; r < 31; r++)
     {
       for(u_char c = 0; c <= 11; c++)
 	{
