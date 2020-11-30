@@ -9,6 +9,8 @@
 
 short redrawScreen = 1;
 
+u_char width = screenWidth, height = screenHeight;
+
 u_int fontFgColor = COLOR_RED;
 u_int screenColor = COLOR_BLUE;
 
@@ -20,12 +22,15 @@ void wdt_c_handler()
     case 0: /* siren state */	 
      if ((++count % 25) == 0)
        {
+	 redrawScreen = 1;
+	 screenColor = COLOR_BLUE;
 	 siren_on();
        }
      if(++count == 250)
        {
+	 screenColor = COLOR_RED;
     	 siren_advance();
-	 //redrawScreen = 1;
+	 redrawScreen = 1;
 	 count = 0;
        }
      break;
@@ -52,7 +57,7 @@ void wdt_c_handler()
       if(++count == 250)
 	{
 	  redrawScreen = 1;
-	  count = 0;
+	  //count = 0;
 	}
       break;
     default:
@@ -69,8 +74,9 @@ void main()
   switch_init();
   buzzer_init();
 
-  green_on = 1;
+  red_on = 1; /* using red instead of green for cpu*/
   led_update();
+  
   enableWDTInterrupts();      /**< enable periodic interrupt */
   or_sr(0x8);	              /**< GIE (enable interrupts) */
 
@@ -81,12 +87,12 @@ void main()
 	switch(switch_state_down)
 	  {
 	  case 0:
-	    // clearScreen(COLOR_RED);
-	    break;
+	     clearScreen(screenColor);
+          break;
 	    
 	  case 1:
-	    drawString5x7(20,20, "Hello", COLOR_RED, COLOR_PURPLE);
-	    clearScreen(COLOR_PURPLE);
+	    drawString5x7(20,20, "Hello", COLOR_RED, screenColor);
+	    clearScreen(screenColor);
 	    break;
 
 	  case 2:
@@ -102,12 +108,34 @@ void main()
 	  default:break;
 	  }
   }
-    green_on = 0;	/* green off */
+    red_on = 0;	/* red off */
     led_update();
     
     or_sr(0x10);       	/**< CPU OFF */
     
-    green_on = 1;      	/* green on */
+    red_on = 1;      	/* red on */
     led_update();
  }
+}
+
+void drawSquare()
+{
+ u_char center = 5;
+  for(u_char r = 0; r < 11; r++)
+    {
+      for(u_char c = 0; c <= 11; c++)
+	{
+	  drawPixel(c, r, COLOR_WHITE);  
+	  drawPixel(r, c, COLOR_WHITE);
+	}
+    }
+
+  for(u_char r = 0; r < center; r++)
+    {
+      for(u_char c = 0; c < center; c++)
+	{
+	  drawPixel(c + center, r + center, COLOR_BLACK);
+	   drawPixel(c - center, r - center, COLOR_BLACK);
+	}
+    } 
 }

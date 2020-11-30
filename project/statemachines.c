@@ -5,7 +5,7 @@
 #include "lcdutils.h"
 #include "lcddraw.h"
 
-static char up; /* used to see if the siren is increasing */
+char up; /* used to see if the siren is increasing */
 
 void siren_on()/* activate the siren */
 {
@@ -19,38 +19,16 @@ void siren_on()/* activate the siren */
   buzzer_set_period(cycles);
 }
 
-void siren_advance()
-{
-  static char state = 0;
-  switch(state)
-    {
-    case 0:/* state 1 red off */
-      red_on = 0;
-      led_update();
-      up = 1;
-      state++;
-      break;
-    case 1:/* state 2 red on */
-      red_on = 1;
-      led_update();
-      state = 0;
-      up = 0;
-      break;
-    default:
-      break;
-    }
-}
-
-void light_advance() /* just turns on the red LED */
+void light_advance() /* just turns on the green LED */
 {
   buzzer_set_period(0);
-  red_on = 1;
+  green_on = 1;
   led_update();
 }
 
 void buzz_off()/* Turns off everything */
 {
   buzzer_set_period(0);
-  red_on = 0;
+  green_on = 0;
   led_update();
 }
