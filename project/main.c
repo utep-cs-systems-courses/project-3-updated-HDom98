@@ -36,8 +36,6 @@ void wdt_c_handler()
        }
      break;
     case 1:/* light dimming state */
-      //if((++count % 50) == 0) light_advance();
-      buzz_off();
       if(++count == 250)
 	{
 	  shapeColor1 = COLOR_BLUE;
@@ -47,7 +45,6 @@ void wdt_c_handler()
 	}
       break;
     case 2:/* blinking light state */
-      //if(++count == 125) light_advance();
       buzz_off();
       if(++count == 250)
 	{
@@ -104,8 +101,8 @@ void main()
 
 	  case 2:
 	    clearScreen(COLOR_BLACK);
-	    drawString5x7(20,20, "WEE WOO", COLOR_BLUE, COLOR_GREEN);
-	    drawString5x7(20,50, "WEE WOO", COLOR_RED, COLOR_GREEN);
+	    drawString5x7(20,30, "WEE WOO", COLOR_BLUE, COLOR_BLACK);
+	    drawString5x7(20,50, "WEE WOO", COLOR_RED, COLOR_BLACK);
 	    drawSquare(shapeColor1,shapeColor2);
 	    break;
 	    
