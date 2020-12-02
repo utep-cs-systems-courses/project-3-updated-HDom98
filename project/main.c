@@ -18,6 +18,8 @@ u_int screenColor = COLOR_BLUE;
 void wdt_c_handler()
 {
   static int count = 0;
+  static int dimCount = 0;
+  static int dimMode = 0;
   switch(switch_state_down)
     {
     case 0: /* siren state */
@@ -36,30 +38,54 @@ void wdt_c_handler()
        }
      break;
     case 1:/* light dimming state */
-      if(++count == 250)
+      buzz_off();
+      
+      if((++count % 25) == 0 && dimMode == 1)
 	{
-	  shapeColor1 = COLOR_BLUE;
-	  shapeColor2 = COLOR_RED;
+	  light_advance();
+	  dimCount++;
+	}
+      
+       else  if((++count % 50) == 0 && dimMode == 2)
+	{
+	  light_advance();
+	  dimCount++;
+        }
+
+      else if(dimMode == -1 || dimMode == 0)
+	{/* led is off */
+	  dimCount++;
+	}
+      
+      if(dimCount == 3 && ++count == 250)
+	{/* after 3 cycles change dim mode */
+	  dimCount = 0;
+	  dim(dimMode);
+	}
+      
+      else if(++count == 250)
+	{
 	  redrawScreen = 1;
 	  count = 0;
 	}
       break;
-    case 2:/* blinking light state */
+    case 2:/*shapes state */
       buzz_off();
       if(++count == 250)
 	{
-	  shapeColor1 = COLOR_PURPLE;
-	  shapeColor2 = COLOR_PINK;
+	  shapeColor1 = (shapeColor1 == COLOR_BLUE) ? COLOR_PURPLE : COLOR_RED;
+	  shapeColor2 = (shapeColor2 == COLOR_RED) ? COLOR_PINK : COLOR_BLUE;
+	  screenColor = (screenColor == COLOR_BLUE) ? COLOR_ORANGE : COLOR_RED;
 	  redrawScreen = 1;
 	  count = 0;
 	}
       break;
     case 3:/* off state */
       buzz_off();
+      shapeColor1 = (shapeColor1 == COLOR_PURPLE) ? COLOR_GREEN : COLOR_WHITE;
+	  shapeColor2 = (shapeColor2 == COLOR_PINK) ? COLOR_WHITE : COLOR_RED;
       if(++count == 250)
 	{
-	  shapeColor1 = COLOR_GREEN;
-	  shapeColor2 = COLOR_WHITE;
 	  redrawScreen = 1;
 	}
       break;
@@ -94,14 +120,13 @@ void main()
           break;
 	    
 	  case 1:
-	    drawSquare(shapeColor1,shapeColor2);
-	    drawString5x7(20,20, "Hello", COLOR_RED, screenColor);
-	    clearScreen(screenColor);
+	    drawString5x7(20,20, "Hello", COLOR_RED, COLOR_GREEN);
+	    clearScreen(COLOR_GREEN);
 	    break;
 
 	  case 2:
 	    clearScreen(COLOR_BLACK);
-	    drawString5x7(20,30, "WEE WOO", COLOR_BLUE, COLOR_BLACK);
+	    drawString5x7(20,40, "WEE WOO", COLOR_BLUE, COLOR_BLACK);
 	    drawString5x7(20,50, "WEE WOO", COLOR_RED, COLOR_BLACK);
 	    drawSquare(shapeColor1,shapeColor2);
 	    break;
