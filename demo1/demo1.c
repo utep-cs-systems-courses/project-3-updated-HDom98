@@ -6,7 +6,7 @@
 #include "lcdutils.h"
 #include "lcddraw.h"
 
-/** Initializes everything, clears the screen, draws "hello" and a square */
+/** Initializes everything, clears the screen, draws "hello" and squares */
 int
 main()
 {
@@ -14,11 +14,12 @@ main()
   lcd_init();
   u_char width = screenWidth, height = screenHeight;
 
-  clearScreen(COLOR_BLUE);
+  clearScreen(COLOR_BLACK);
 
-  //drawString5x7(20,20, "hello", COLOR_GREEN, COLOR_RED);
+  drawString11x16(20,20, "hello", COLOR_GREEN, COLOR_RED);
 
-  //fillRectangle(30,30, 60, 60, COLOR_ORANGE);
+  fillRectangle(5, 40, 8, 50, COLOR_BLUE);
+  fillRectangle(width - 13, 40, 8, 50, COLOR_RED);
 
   //u_char offc = 3;
   //u_char offr = 4;
