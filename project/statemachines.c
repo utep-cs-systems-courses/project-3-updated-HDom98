@@ -5,9 +5,9 @@
 #include "lcdutils.h"
 #include "lcddraw.h"
 
-char up; /* used to see if the siren is increasing */
+ /* used to see if the siren is increasing */
 
-void siren_on()/* activate the siren */
+void siren_on(char up)/* activate the siren */
 {
   double x;
   short cycles = 0;

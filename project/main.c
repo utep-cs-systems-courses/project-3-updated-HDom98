@@ -17,6 +17,7 @@ u_int screenColor = COLOR_BLUE;
 
 void wdt_c_handler()
 {
+  char up = 0;
   static int count = 0;
   static int dimCount = 0;
   static int dimMode = 0;
@@ -25,13 +26,13 @@ void wdt_c_handler()
     case 0: /* siren state */
      if ((++count % 25) == 0)
        {
-	 siren_on();
+	 siren_on(up);
 	 redrawScreen = 1;
 	 screenColor = COLOR_BLUE;
        }
      if(++count == 250)
        {
-	 siren_advance();
+	 up = siren_advance();
 	 screenColor = COLOR_RED;
 	 redrawScreen = 1;
 	 count = 0;
@@ -51,7 +52,6 @@ void wdt_c_handler()
 	  light_advance();
 	  dimCount++;
         }
-
       else if(dimMode == -1 || dimMode == 0)
 	{/* led is off */
 	  dimCount++;
@@ -69,7 +69,7 @@ void wdt_c_handler()
 	  count = 0;
 	}
       break;
-    case 2:/*shapes state */
+    case 2:/* shapes state */
       buzz_off();
       if(++count == 250)
 	{
