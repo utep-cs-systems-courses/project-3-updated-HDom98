@@ -57,7 +57,7 @@ void wdt_c_handler()
 	  dimCount++;
 	}
       
-      if(dimCount == 3 && ++count == 250)
+      if(dimCount >= 3 && ++count == 250)
 	{/* after 3 cycles change dim mode */
 	  dimCount = 0;
 	  dim(dimMode);
@@ -82,8 +82,8 @@ void wdt_c_handler()
       break;
     case 3:/* off state */
       buzz_off();
-      shapeColor1 = (shapeColor1 == COLOR_PURPLE) ? COLOR_GREEN : COLOR_WHITE;
-	  shapeColor2 = (shapeColor2 == COLOR_PINK) ? COLOR_WHITE : COLOR_RED;
+      shapeColor1 = (shapeColor1 == COLOR_RED) ? COLOR_GREEN : COLOR_WHITE;
+	  shapeColor2 = (shapeColor2 == COLOR_BLUE) ? COLOR_WHITE : COLOR_RED;
       if(++count == 250)
 	{
 	  redrawScreen = 1;

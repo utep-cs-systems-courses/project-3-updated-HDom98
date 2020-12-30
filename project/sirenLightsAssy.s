@@ -15,7 +15,7 @@ jt:	.word option0
 			
 	.global siren_advance
 siren_advance:
-	cmp #3, r12		;jumping to default if its over 2
+	cmp #2, r12		;jumping to default if its over 2
 	jhs default
 	mov jt(r12), r0
 option0:			;state 0 siren has a higher pitch, green LED is off 
